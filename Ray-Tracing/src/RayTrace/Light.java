@@ -1,10 +1,12 @@
+package RayTrace;
+
 class Light{
     private float x, y, z;
-    private int r, g, b;
+    private float r, g, b;
     private float spec_intens, shadow_intens, radius;
 
     public Light(float x, float y, float z,
-                 int r, int g, int b,
+                 float r, float g, float b,
                  float spec_intens, float shadow_intens, float radius){
         this.x = x;
         this.y = y;

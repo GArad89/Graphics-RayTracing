@@ -1,5 +1,4 @@
-
-package RayTracing;
+package RayTrace;
  
 import java.awt.Transparency;
 import java.awt.color.*;
@@ -17,7 +16,8 @@ import javax.imageio.ImageIO;
  *  Main class for ray tracing exercise.
  */
 public class RayTracer {
- 
+	
+	public Scene scene;
     public int imageWidth;
     public int imageHeight;
  
@@ -55,8 +55,8 @@ public class RayTracer {
  
 //      } catch (IOException e) {
 //          System.out.println(e.getMessage());
-        } catch (RayTracerException e) {
-            System.out.println(e.getMessage());
+     //   } catch (RayTracerException e) {
+     //       System.out.println(e.getMessage());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -69,16 +69,28 @@ public class RayTracer {
      */
     public void parseScene(String sceneFileName) throws IOException, RayTracerException
     {
-        FileReader fr = new FileReader(sceneFileName);
- 
-        BufferedReader r = new BufferedReader(fr);
-        String line = null;
+        String scene_fn=sceneFileName;
+        //int h=Integer.parseInt(args[2]), w=Integer.parseInt(args[3]);
+        BufferedReader reader = new BufferedReader(new FileReader(new File(scene_fn)));
+        ArrayList<Material> mats = new ArrayList<Material>();
+        boolean missing_mat = false;
+        boolean missing_paramter = false;
+        int mat_index =0;
+        String line;
+        Scene scene=null;
+        Camera cam=null;
+        Surface surf;
+        Light light;
+        Material mat;
+        //FileReader fr = new FileReader(sceneFileName);
+        //BufferedReader r = new BufferedReader(fr);
+        //String line = null;
         int lineNum = 0;
         System.out.println("Started parsing scene file " + sceneFileName);
  
  
  
-        while ((line = r.readLine()) != null)
+        while ((line = reader.readLine()) != null)
         {
             line = line.trim();
             ++lineNum;
@@ -95,45 +107,139 @@ public class RayTracer {
  
                 if (code.equals("cam"))
                 {
-                                        // Add code here to parse camera parameters
- 
-                    System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
+                	if(params.length >= 11) {
+	                    cam = new Camera(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
+	                            Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]),
+	                            Float.parseFloat(params[6]), Float.parseFloat(params[7]), Float.parseFloat(params[8]),
+	                            Float.parseFloat(params[9]), Float.parseFloat(params[10]));
+	                    if(scene != null)
+	                        scene.setCam(cam);
+	 
+	                    System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
+                	}
+                	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed camera is missing parameters (line %d)", lineNum));
+                	}
                 }
                 else if (code.equals("set"))
                 {
-                                        // Add code here to parse general settings parameters
- 
-                    System.out.println(String.format("Parsed general settings (line %d)", lineNum));
+                	if(params.length >= 6) {
+	                	 scene = new Scene(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
+	                             Integer.parseInt(params[3]), Integer.parseInt(params[4]), Integer.parseInt(params[5]));
+	                	 if(cam != null)
+	                		 scene.setCam(cam);
+	 
+	                    System.out.println(String.format("Parsed general settings (line %d)", lineNum));
+                	}
+                	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed general settings is missing parameters (line %d)", lineNum));
+                	}
                 }
                 else if (code.equals("mtl"))
                 {
-                                        // Add code here to parse material parameters
- 
-                    System.out.println(String.format("Parsed material (line %d)", lineNum));
+                	if(params.length >= 11) {
+	                	mat = new Material(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]), 
+	                            Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]),
+	                            Float.parseFloat(params[6]), Float.parseFloat(params[7]), Float.parseFloat(params[8]),
+	                            Float.parseFloat(params[9]), Float.parseFloat(params[10]));
+	                	mats.add(mat);
+	 
+	                    System.out.println(String.format("Parsed material (line %d)", lineNum));
+                	}
+                	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed material is missing parameters (line %d)", lineNum));
+                	}
                 }
                 else if (code.equals("sph"))
                 {
-                                        // Add code here to parse sphere parameters
- 
-                                        // Example (you can implement this in many different ways!):
-                    // Sphere sphere = new Sphere();
-                                        // sphere.setCenter(params[0], params[1], params[2]);
-                                        // sphere.setRadius(params[3]);
-                                        // sphere.setMaterial(params[4]);
- 
-                    System.out.println(String.format("Parsed sphere (line %d)", lineNum));
+                	if(params.length >= 5) {
+	                	mat_index=Integer.parseInt(params[4])-1;
+	                	if(mats.size() > mat_index) {
+		                	mat = mats.get(mat_index);
+		                    surf = new Sphere(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
+		                                     Float.parseFloat(params[3]), mat);
+		                    scene.addSurface(surf);
+		 
+		                                        // Example (you can implement this in many different ways!):
+		                    // Sphere sphere = new Sphere();
+		                                        // sphere.setCenter(params[0], params[1], params[2]);
+		                                        // sphere.setRadius(params[3]);
+		                                        // sphere.setMaterial(params[4]);
+		 
+		                    System.out.println(String.format("Parsed sphere (line %d)", lineNum));
+	                	}
+	                	else {
+	                		missing_mat = true;
+	                		System.out.println(String.format("ERROR: material index for sphere doesn't exist (line %d)", lineNum));
+	                	}
+                	}
+                  	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed sphere is missing parameters (line %d)", lineNum));
+                	}
                 }
                 else if (code.equals("pln"))
                 {
-                                        // Add code here to parse plane parameters
- 
-                    System.out.println(String.format("Parsed plane (line %d)", lineNum));
+                	if(params.length >= 5) {
+                		mat_index=Integer.parseInt(params[4])-1;
+                		if(mats.size() > mat_index) {
+		                	mat = mats.get(Integer.parseInt(params[4])-1);
+		                    surf = new Plane(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
+		                                     Float.parseFloat(params[3]), mat);
+		                    scene.addSurface(surf);
+		 
+		                    System.out.println(String.format("Parsed plane (line %d)", lineNum));
+                		}
+	                	else {
+	                		missing_mat = true;
+	                		System.out.println(String.format("ERROR: material index for plane doesn't exist (line %d)", lineNum));
+	                	}
+                	}
+                	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed plane is missing parameters (line %d)", lineNum));
+                	}
+                }
+                else if (code.equals("trg"))
+                {
+                	if(params.length >= 10) {
+                		mat_index=Integer.parseInt(params[4])-1;
+                		if(mats.size() > mat_index) {
+		                	 mat = mats.get(Integer.parseInt(params[9])-1);
+		                     surf = new Triangle(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
+		                                        Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]),
+		                                        Float.parseFloat(params[6]), Float.parseFloat(params[7]), Float.parseFloat(params[8]), mat);
+		                     scene.addSurface(surf);
+		                     
+		                    System.out.println(String.format("Parsed triangle (line %d)", lineNum));
+                		}
+                		else {
+	                		missing_mat = true;
+	                		System.out.println(String.format("ERROR: material index for triangle doesn't exist (line %d)", lineNum));
+                		}
+                	}
+                	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed triangle is missing parameters (line %d)", lineNum));
+                	}
                 }
                 else if (code.equals("lgt"))
                 {
-                                        // Add code here to parse light parameters
- 
-                    System.out.println(String.format("Parsed light (line %d)", lineNum));
+                	if(params.length >= 9) {
+	                    light = new Light(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
+	                            Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]),
+	                            Float.parseFloat(params[6]), Float.parseFloat(params[7]), Float.parseFloat(params[8]));
+	                    scene.addLight(light);
+	 
+	                    System.out.println(String.format("Parsed light (line %d)", lineNum));
+                	}
+                  	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed light is missing parameters (line %d)", lineNum));
+                	}
                 }
                 else
                 {
@@ -141,11 +247,19 @@ public class RayTracer {
                 }
             }
         }
- 
-                // It is recommended that you check here that the scene is valid,
-                // for example camera settings and all necessary materials were defined.
- 
+        reader.close();
+        if((scene == null)||(cam == null)) {
+        	System.out.println("Critical Error occured while parsing scene file " + sceneFileName);
+        	System.out.println("general setting or camera are missing.");
+        	return;
+        }
+        if((missing_paramter == true)||(missing_mat == true)) {
+        	System.out.println("Error occured while parsing scene file " + sceneFileName);
+        	System.out.println("At least one line with missing paratmers or invalid material index.");
+        }
         System.out.println("Finished parsing scene file " + sceneFileName);
+        this.scene = scene;
+ 
  
     }
  
@@ -158,7 +272,7 @@ public class RayTracer {
  
         // Create a byte array to hold the pixel data:
         byte[] rgbData = new byte[this.imageWidth * this.imageHeight * 3];
- 
+        scene.Render(rgbData, this.imageWidth, this.imageHeight);
  
                 // Put your ray tracing code here!
                 //
@@ -224,6 +338,7 @@ public class RayTracer {
     public static class RayTracerException extends Exception {
         public RayTracerException(String msg) {  super(msg); }
     }
- 
+    
+
  
 }
