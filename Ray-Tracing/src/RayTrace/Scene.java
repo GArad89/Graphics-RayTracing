@@ -37,6 +37,7 @@ class Scene{
     public void Render(byte[] rgbData, int imageWidth,int imageHeight) {
         int i=0;
         int j=0;
+        float[] lightInt = new float[rgbData.length];
        // float mod=0; //need a better name
         Vector camleft = this.cam.look_v.cross(this.cam.up); //the "left direction" of the camera.
         camleft = camleft.prod(1/camleft.size()); //normalize camleft
@@ -49,9 +50,11 @@ class Scene{
         Vector j_step = camleft.prod((float)((-this.cam.screen_width)/((float)imageWidth))); 
         Vector i_step = this.cam.up.prod((float)((screen_height)/((float)imageHeight))); 
         Ray camray = null;
+        Ray lightray = null;
         int min_ind=-1;
         float min_val=Float.POSITIVE_INFINITY;
         float temp;
+        float maxlight =0;
         
         for(i=0;i<imageHeight;i++) {
         	for(j=0;j<imageWidth;j++) {
@@ -68,8 +71,27 @@ class Scene{
 //        		pixelCord = pixelCord.plus(this.cam.look.prod(this.cam.screen_dist));
 //        		camray = new Ray()
         		if(min_ind > -1) {
+        			for(int k=0; k< this.lights.size();k++) {
+        				lightray = new Ray(this.lights.get(k).pos, new Vector(this.lights.get(k).pos,camray.getPos(min_val)),this.lights.get(k));
+        				temp = Float.POSITIVE_INFINITY;
+        				for(int m=0; m<this.surfs.size();m++) {
+        					temp = Math.min(this.surfs.get(m).intersect(lightray),temp);
+        				}
+        				if(temp == this.surfs.get(min_ind).intersect(lightray)) {
+        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] += lightray.light.r;
+        					
+        					 
+        					maxlight = Math.max(maxlight, lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
+        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] += lightray.light.g;
+        					maxlight = Math.max(maxlight, lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
+        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] += lightray.light.b;
+        					maxlight = Math.max(maxlight, lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
+        				}
+        			}
 	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.surfs.get(min_ind).mat.diff_r*255);
+	        		
 	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+1] = (byte) (this.surfs.get(min_ind).mat.diff_g*255);
+	        		
 	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+2] = (byte) (this.surfs.get(min_ind).mat.diff_b*255);
         		}
         		else {
@@ -81,7 +103,14 @@ class Scene{
         		min_val = Float.POSITIVE_INFINITY;
         	}
         }
-       
+      System.out.println(maxlight);
+    //  maxlight =5;
+       for(int k=0; k< rgbData.length;k++) {
+    	// System.out.println(rgbData[k]);
+    	   rgbData[k] = (byte) ((float)(rgbData[k])*lightInt[k]/maxlight);
+    	// System.out.println(rgbData[k]);
+       }
+      
     }
     
 }
