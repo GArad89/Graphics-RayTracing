@@ -37,30 +37,51 @@ class Scene{
     public void Render(byte[] rgbData, int imageWidth,int imageHeight) {
         int i=0;
         int j=0;
-        float mod=0; //need a better name
-        //need to go over this again
-//        Vector camleft = this.cam.look_v.cross(this.cam.up); //the "left direction" of the camera.
-//        Vector pixelCord= null; //the coordinate of the pixel (bottom left corner for now, no supersampling yet)
-//        Vector p_0 = this.cam.look.minus(this.cam.pos).prod(this.cam.screen_dist);  //the vector to pixel[0,0]
-//        mod = this.cam.look.minus(this.cam.pos).size();
-//        p_0 = p_0.plus(camleft.prod((float)(mod*0.5)));
-//        p_0 = p_0.plus(this.cam.up.prod((float)(-mod*0.5))); //this is a vector from pos to p_0. NOT the coordinates of p_0
-//        Vector j_step = p_0.plus(camleft.prod((float)(mod/((float)imageWidth)))).minus(p_0); 
-//        
-//        float screen_height = ((float)imageHeight/(float)imageWidth)*this.cam.screen_width;
-//        Vector i_step = p_0.plus(camleft.prod((float)(mod/((float)imageHeight)))).minus(p_0); 
+       // float mod=0; //need a better name
+        Vector camleft = this.cam.look_v.cross(this.cam.up); //the "left direction" of the camera.
+        camleft = camleft.prod(1/camleft.size()); //normalize camleft
+       // Vector pixelCord= null; //the coordinate of the pixel (bottom left corner for now, no supersampling yet)
+        Vector p_0 = this.cam.look_v.prod(this.cam.screen_dist);  //the vector to pixel[0,0]
+        //mod = this.cam.look.minus(this.cam.pos).size();
+        p_0 = p_0.plus(camleft.prod((float)(0.5*this.cam.screen_width)));
+        float screen_height = ((float)imageHeight/(float)imageWidth)*this.cam.screen_width;
+        p_0 = p_0.plus(this.cam.up.prod((float)(-0.5*screen_height))); //this is a vector from pos to p_0. NOT the coordinates of p_0
+        Vector j_step = camleft.prod((float)((-this.cam.screen_width)/((float)imageWidth))); 
+        Vector i_step = this.cam.up.prod((float)((screen_height)/((float)imageHeight))); 
         Ray camray = null;
+        int min_ind=-1;
+        float min_val=Float.POSITIVE_INFINITY;
+        float temp;
+        
         for(i=0;i<imageHeight;i++) {
         	for(j=0;j<imageWidth;j++) {
+        		camray = new Ray(this.cam.pos,p_0.plus(j_step.prod((float)j).plus(i_step.prod((float)i))));
+        		for(int k=0;k< this.surfs.size();k++) {
+        			temp = this.surfs.get(k).intersect(camray);
+        			if(temp < min_val) {
+        				min_ind = k;
+        				min_val = temp;
+        			}
+        		}
 //        		pixelCord = camleft.prod(((float)j)/((float)imageWidth));
 //        		pixelCord = pixelCord.plus(this.cam.up.prod(((float)i)/((float)imageHeight)));
 //        		pixelCord = pixelCord.plus(this.cam.look.prod(this.cam.screen_dist));
 //        		camray = new Ray()
-        		rgbData[(i+j*imageWidth)*3] = (byte) (this.bg_r*255);
-        		rgbData[(i+j*imageWidth)*3+1] = (byte) (this.bg_g*255);
-        		rgbData[(i+j*imageWidth)*3+2] = (byte) (this.bg_b*255);
+        		if(min_ind > -1) {
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.surfs.get(min_ind).mat.diff_r*255);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+1] = (byte) (this.surfs.get(min_ind).mat.diff_g*255);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+2] = (byte) (this.surfs.get(min_ind).mat.diff_b*255);
+        		}
+        		else {
+             		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.bg_r*255);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+1] = (byte) (this.bg_g*255);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+2] = (byte) (this.bg_b*255);
+        		}
+        		min_ind =-1;
+        		min_val = Float.POSITIVE_INFINITY;
         	}
         }
+       
     }
-
+    
 }

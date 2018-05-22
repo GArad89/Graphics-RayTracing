@@ -1,11 +1,11 @@
 package RayTrace;
 
 class Material{
-    private float diff_r, diff_g, diff_b;
-    private float spec_r, spec_g, spec_b;
-    private float reflect_r, reflect_g, reflect_b;
-    private float phong;
-    private float trans;
+     float diff_r, diff_g, diff_b;
+     float spec_r, spec_g, spec_b;
+     float reflect_r, reflect_g, reflect_b;
+     float phong;
+     float trans;
     
     public Material(float diff_r, float diff_g, float diff_b,
                     float spec_r, float spec_g, float spec_b,

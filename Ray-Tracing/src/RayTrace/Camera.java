@@ -17,6 +17,7 @@ class Camera{
     	up = new Vector(up_x,up_y,up_z);
     	look_v = new Vector(pos,look);
     	up = up.minus(look_v.prod(up.dot(look_v)/(look_v.dot(look_v))));  //remove the component of up in the direction of look_v
+    	up = up.prod(1/up.size()); //normalize up
 //        this.pos_x = pos_x;
 //        this.pos_y = pos_y;
 //        this.pos_z = pos_z;

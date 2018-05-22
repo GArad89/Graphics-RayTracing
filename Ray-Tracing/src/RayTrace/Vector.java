@@ -48,6 +48,10 @@ class Vector{
                       this.z - other.z);
     }
     
+    public float size() {
+    	return (float)Math.sqrt(this.dot(this));
+    }
+    
     public String toString(){
         return String.format("%f %f %f", x, y, z);
     }

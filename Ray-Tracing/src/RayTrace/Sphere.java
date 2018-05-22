@@ -23,7 +23,7 @@ class Sphere extends Surface{
         a = ray.direct2;
         b = 2*(ray.src_dot_direct - center.dot(ray.direct));
         c = ray.src2 - 2*center.dot(ray.src) + center2 - radius2;
-        System.out.println(new Vector(a, b, c));
+       // System.out.println(new Vector(a, b, c));
         if(b >= 0)
             if(c > 0)
                 return Float.POSITIVE_INFINITY;
