@@ -2,16 +2,16 @@ package RayTrace;
 
 class Camera{
     
-    Vector pos; //float pos_x, pos_y, pos_z;
-    Vector look; //float look_x, look_y, look_z;
+    Vector pos; //double pos_x, pos_y, pos_z;
+    Vector look; //double look_x, look_y, look_z;
     Vector look_v;
-    Vector up; //float up_x, up_y, up_z;
-    float screen_dist, screen_width;
+    Vector up; //double up_x, up_y, up_z;
+    double screen_dist, screen_width;
     
-    public Camera(float pos_x, float pos_y, float pos_z,
-                  float look_x, float look_y, float look_z,
-                  float up_x, float up_y, float up_z,
-                  float screen_dist, float screen_width){
+    public Camera(double pos_x, double pos_y, double pos_z,
+                  double look_x, double look_y, double look_z,
+                  double up_x, double up_y, double up_z,
+                  double screen_dist, double screen_width){
     	pos = new Vector(pos_x,pos_y,pos_z);
     	look = new Vector(look_x,look_y,look_z);
     	up = new Vector(up_x,up_y,up_z);

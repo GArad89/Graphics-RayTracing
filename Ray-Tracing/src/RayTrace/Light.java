@@ -1,14 +1,16 @@
 package RayTrace;
 
-class Light{
-     //float x, y, z;
-     Vector pos;
-     float r, g, b;
-    float spec_intens, shadow_intens, radius;
 
-    public Light(float x, float y, float z,
-                 float r, float g, float b,
-                 float spec_intens, float shadow_intens, float radius){
+
+class Light{
+     //double x, y, z;
+     Vector pos;
+     double r, g, b;
+    double spec_intens, shadow_intens, radius;
+
+    public Light(double x, double y, double z,
+                 double r, double g, double b,
+                 double spec_intens, double shadow_intens, double radius){
     	this.pos = new Vector(x,y,z);
        // this.x = x;
        // this.y = y;
@@ -20,5 +22,7 @@ class Light{
         this.shadow_intens = shadow_intens;
         this.radius = radius;                
     }
+
+   
     
 }

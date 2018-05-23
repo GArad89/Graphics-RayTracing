@@ -108,10 +108,10 @@ public class RayTracer {
                 if (code.equals("cam"))
                 {
                 	if(params.length >= 11) {
-	                    cam = new Camera(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
-	                            Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]),
-	                            Float.parseFloat(params[6]), Float.parseFloat(params[7]), Float.parseFloat(params[8]),
-	                            Float.parseFloat(params[9]), Float.parseFloat(params[10]));
+	                    cam = new Camera(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
+	                            Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5]),
+	                            Double.parseDouble(params[6]), Double.parseDouble(params[7]), Double.parseDouble(params[8]),
+	                            Double.parseDouble(params[9]), Double.parseDouble(params[10]));
 	                    if(scene != null)
 	                        scene.setCam(cam);
 	 
@@ -125,7 +125,7 @@ public class RayTracer {
                 else if (code.equals("set"))
                 {
                 	if(params.length >= 6) {
-	                	 scene = new Scene(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
+	                	 scene = new Scene(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
 	                             Integer.parseInt(params[3]), Integer.parseInt(params[4]), Integer.parseInt(params[5]));
 	                	 if(cam != null)
 	                		 scene.setCam(cam);
@@ -140,10 +140,10 @@ public class RayTracer {
                 else if (code.equals("mtl"))
                 {
                 	if(params.length >= 11) {
-	                	mat = new Material(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]), 
-	                            Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]),
-	                            Float.parseFloat(params[6]), Float.parseFloat(params[7]), Float.parseFloat(params[8]),
-	                            Float.parseFloat(params[9]), Float.parseFloat(params[10]));
+	                	mat = new Material(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]), 
+	                            Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5]),
+	                            Double.parseDouble(params[6]), Double.parseDouble(params[7]), Double.parseDouble(params[8]),
+	                            Double.parseDouble(params[9]), Double.parseDouble(params[10]));
 	                	mats.add(mat);
 	 
 	                    System.out.println(String.format("Parsed material (line %d)", lineNum));
@@ -159,8 +159,8 @@ public class RayTracer {
 	                	mat_index=Integer.parseInt(params[4])-1;
 	                	if(mats.size() > mat_index) {
 		                	mat = mats.get(mat_index);
-		                    surf = new Sphere(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
-		                                     Float.parseFloat(params[3]), mat);
+		                    surf = new Sphere(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
+		                                     Double.parseDouble(params[3]), mat);
 		                    scene.addSurface(surf);
 		 
 		                                        // Example (you can implement this in many different ways!):
@@ -187,8 +187,8 @@ public class RayTracer {
                 		mat_index=Integer.parseInt(params[4])-1;
                 		if(mats.size() > mat_index) {
 		                	mat = mats.get(Integer.parseInt(params[4])-1);
-		                    surf = new Plane(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
-		                                     Float.parseFloat(params[3]), mat);
+		                    surf = new Plane(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
+		                                     Double.parseDouble(params[3]), mat);
 		                    scene.addSurface(surf);
 		 
 		                    System.out.println(String.format("Parsed plane (line %d)", lineNum));
@@ -209,9 +209,9 @@ public class RayTracer {
                 		mat_index=Integer.parseInt(params[4])-1;
                 		if(mats.size() > mat_index) {
 		                	 mat = mats.get(Integer.parseInt(params[9])-1);
-		                     surf = new Triangle(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
-		                                        Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]),
-		                                        Float.parseFloat(params[6]), Float.parseFloat(params[7]), Float.parseFloat(params[8]), mat);
+		                     surf = new Triangle(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
+		                                        Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5]),
+		                                        Double.parseDouble(params[6]), Double.parseDouble(params[7]), Double.parseDouble(params[8]), mat);
 		                     scene.addSurface(surf);
 		                     
 		                    System.out.println(String.format("Parsed triangle (line %d)", lineNum));
@@ -229,9 +229,9 @@ public class RayTracer {
                 else if (code.equals("lgt"))
                 {
                 	if(params.length >= 9) {
-	                    light = new Light(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]),
-	                            Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]),
-	                            Float.parseFloat(params[6]), Float.parseFloat(params[7]), Float.parseFloat(params[8]));
+	                    light = new Light(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
+	                            Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5]),
+	                            Double.parseDouble(params[6]), Double.parseDouble(params[7]), Double.parseDouble(params[8]));
 	                    scene.addLight(light);
 	 
 	                    System.out.println(String.format("Parsed light (line %d)", lineNum));

@@ -5,5 +5,5 @@ abstract class Surface{
     
     public abstract Vector normal(Vector pos);
     
-    public abstract float intersect(Ray ray);
+    public abstract double intersect(Ray ray);
 }

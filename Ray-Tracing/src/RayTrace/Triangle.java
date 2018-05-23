@@ -4,12 +4,12 @@ import java.lang.Math;
 class Triangle extends Plane{
     Vector v1, v2, v3;
     Vector n12, n23, n13;
-    float c12, c23, c13;
-    float sign12, sign23, sign13;
+    double c12, c23, c13;
+    double sign12, sign23, sign13;
     
-    public Triangle(float x1, float y1, float z1,
-                    float x2, float y2, float z2,
-                    float x3, float y3, float z3,             
+    public Triangle(double x1, double y1, double z1,
+                    double x2, double y2, double z2,
+                    double x3, double y3, double z3,             
                     Material mat){
         this.v1 = new Vector(x1, y1, z1);
         this.v2 = new Vector(x2, y2, z2);
@@ -20,7 +20,7 @@ class Triangle extends Plane{
         this.c = v1.dot(this.normal);
         this.mat = mat;
         
-        Vector center = v1.plus(v2).plus(v3).prod((float)1./3);
+        Vector center = v1.plus(v2).plus(v3).prod((double)1./3);
         
         this.n12 = v12.cross(this.normal);
         this.c12 = n12.dot(v1);
@@ -38,13 +38,13 @@ class Triangle extends Plane{
     }
     
     
-    public float intersect(Ray ray){
-        float t=super.intersect(ray);
+    public double intersect(Ray ray){
+        double t=super.intersect(ray);
         Vector v=ray.src.plus(ray.direct.prod(t));
         if((Math.signum(n12.dot(v) + c12) == -sign12) ||
            (Math.signum(n23.dot(v) + c23) == -sign23) ||
            (Math.signum(n13.dot(v) + c13) == -sign13))
-           return Float.POSITIVE_INFINITY;
+           return Double.POSITIVE_INFINITY;
         return t;
     }
 }

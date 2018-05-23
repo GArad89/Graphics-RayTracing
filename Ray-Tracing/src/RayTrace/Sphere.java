@@ -2,9 +2,9 @@ package RayTrace;
 
 class Sphere extends Surface{
     Vector center;
-    float radius, radius2, center2;
+    double radius, radius2, center2;
     
-    Sphere(float x, float y, float z, float radius, Material mat){
+    Sphere(double x, double y, double z, double radius, Material mat){
         this.center = new Vector(x, y, z);
         this.radius = radius;
         this.radius2 = radius*radius;
@@ -18,26 +18,26 @@ class Sphere extends Surface{
     }
     
     
-    public float intersect(Ray ray){
-        float a, b, c, delta;
+    public double intersect(Ray ray){
+        double a, b, c, delta;
         a = ray.direct2;
         b = 2*(ray.src_dot_direct - center.dot(ray.direct));
         c = ray.src2 - 2*center.dot(ray.src) + center2 - radius2;
        // System.out.println(new Vector(a, b, c));
         if(b >= 0)
             if(c > 0)
-                return Float.POSITIVE_INFINITY;
+                return Double.POSITIVE_INFINITY;
             else { 
                 delta = b*b - 4*a*c;
                 if (delta >= 0)
-                    return (-b+(float)Math.sqrt(delta))/(2*a);
+                    return (-b+(double)Math.sqrt(delta))/(2*a);
                 else
-                    return Float.POSITIVE_INFINITY;
+                    return Double.POSITIVE_INFINITY;
             }
         delta = b*b - 4*a*c;
         if(delta < 0)
-            return Float.POSITIVE_INFINITY;
-        return (-b-(float)Math.sqrt(delta))/(2*a);    
+            return Double.POSITIVE_INFINITY;
+        return (-b-(double)Math.sqrt(delta))/(2*a);    
     }
 
 }

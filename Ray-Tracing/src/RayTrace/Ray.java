@@ -3,7 +3,7 @@ package RayTrace;
 class Ray{
     Light light=null;
     public Vector src, direct;
-    public float src2, direct2, src_dot_direct;
+    public double src2, direct2, src_dot_direct;
 
     public Ray(Vector src, Vector direct, Light light){
         this.src = src;
@@ -22,7 +22,7 @@ class Ray{
         this.src_dot_direct = src.dot(direct);
     }
     
-    public Vector getPos(float t){
+    public Vector getPos(double t){
         return src.plus(direct.prod(t));
     }
         
