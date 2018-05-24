@@ -82,7 +82,8 @@ class Scene{
 	        				for(int m=0; m<this.surfs.size();m++) {
 	        					temp = Math.min(this.surfs.get(m).intersect(lightray),temp);
 	        				}
-	        				if(temp == this.surfs.get(min_ind).intersect(lightray)) {  //surface isn't obscured from light source
+	        				if(new Vector(camray.getPos(min_val),lightray.getPos(temp)).size() < 0.001) {  //surface isn't obscured from light source
+	        					//System.out.println("wow");
 	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] += lightray.light.r;
 	        					
 	        					 
@@ -133,11 +134,11 @@ class Scene{
 //        					}
 //        				}
         			}
-	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.surfs.get(min_ind).mat.diff_r*255);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.surfs.get(min_ind).mat.diff_r*255*lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
 	        		
-	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+1] = (byte) (this.surfs.get(min_ind).mat.diff_g*255);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+1] = (byte) (this.surfs.get(min_ind).mat.diff_g*255*lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
 	        		
-	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+2] = (byte) (this.surfs.get(min_ind).mat.diff_b*255);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+2] = (byte) (this.surfs.get(min_ind).mat.diff_b*255*lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
         		}
         		else {
              		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.bg_r*255);
@@ -148,11 +149,17 @@ class Scene{
         		min_val = Double.POSITIVE_INFINITY;
         	}
         }
+
       System.out.println(maxlight);
-     // maxlight =1.5;
+     maxlight =1;
+//      for(int k=0; k< rgbData.length;k++) {
+//       maxlight=Math.max(maxlight, rgbData[k]);
+//      }
        for(int k=0; k< rgbData.length;k++) {
     	 //System.out.println(rgbData[k]);
-    	   rgbData[k] = (byte) ((double)(rgbData[k])*(lightInt[k]/maxlight));
+    	 //  if(lightInt[k] > 0){
+    		   rgbData[k] =(byte) ((rgbData[k])*(1/(maxlight)));
+    	  // }
     	 //System.out.println(rgbData[k]);
        }
       

@@ -7,7 +7,7 @@ class Ray{
 
     public Ray(Vector src, Vector direct, Light light){
         this.src = src;
-        this.direct = direct;
+        this.direct = direct.prod(1/direct.size());
         this.light = light;
         this.src2 = src.dot(src);
         this.direct2 = direct.dot(direct);
@@ -16,7 +16,7 @@ class Ray{
     
     public Ray(Vector src, Vector direct){ //for tracing rays from the eye (backward tracing)
         this.src = src;
-        this.direct = direct;
+        this.direct = direct.prod(1/direct.size());
         this.src2 = src.dot(src);
         this.direct2 = direct.dot(direct);
         this.src_dot_direct = src.dot(direct);

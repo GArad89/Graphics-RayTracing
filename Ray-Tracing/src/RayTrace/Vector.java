@@ -14,10 +14,10 @@ class Vector{
     	this.y = v2.y - v1.y;
     	this.z = v2.z - v1.z;
     	//normalizing vector size
-    	double size = (double) Math.sqrt(this.x*this.x+this.y*this.y+this.z*this.z);
-    	this.x /=size;
-    	this.y /=size;
-    	this.z /=size;
+    	//double size = (double) Math.sqrt(this.x*this.x+this.y*this.y+this.z*this.z);
+    	//this.x /=size;
+    	//this.y /=size;
+    	//this.z /=size;
     }
     public double dot(Vector other){
         return this.x*other.x + this.y*other.y + this.z*other.z;
@@ -67,6 +67,12 @@ class Vector{
     	return (double)Math.sqrt(this.dot(this));
     }
     
+    public boolean equals(Vector other){
+    	if((this.x == other.x)&&(this.y == other.y )&&(this.z == other.z)){
+    		return true;
+    	}
+    	return false;
+    }
     public String toString(){
         return String.format("%f %f %f", x, y, z);
     }
