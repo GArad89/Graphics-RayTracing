@@ -101,15 +101,15 @@ class Scene{
 	        					maxlight[2] = Math.max(maxlight[2], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
 	        				}
 	        				else { //surface is obscured from light source
-	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] *= lightray.light.r*(1-lightray.light.shadow_intens);
-	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3] /= 2;
-	        					maxlight[0] = Math.max(maxlight[0], lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
-	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] *= lightray.light.g*(1-lightray.light.shadow_intens);
-	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] /= 2;
-	        					maxlight[1] = Math.max(maxlight[1], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
-	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] *= lightray.light.b*(1-lightray.light.shadow_intens);
-	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] /= 2;
-	        					maxlight[2] = Math.max(maxlight[2], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
+//	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] *= lightray.light.r*(1-lightray.light.shadow_intens);
+//	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3] /= 2;
+//	        					maxlight[0] = Math.max(maxlight[0], lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
+//	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] *= lightray.light.g*(1-lightray.light.shadow_intens);
+//	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] /= 2;
+//	        					maxlight[1] = Math.max(maxlight[1], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
+//	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] *= lightray.light.b*(1-lightray.light.shadow_intens);
+//	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] /= 2;
+//	        					maxlight[2] = Math.max(maxlight[2], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
 	        				}
         				}
         				else { //using soft shadows
@@ -149,11 +149,11 @@ class Scene{
         					}
         				}
         			}
-	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.surfs.get(min_ind).mat.diff_r*255*lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.surfs.get(min_ind).mat.diff_r*255*(1-lightInt[(j+(imageHeight-1-i)*imageWidth)*3]));
 	        		
-	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+1] = (byte) (this.surfs.get(min_ind).mat.diff_g*255*lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+1] = (byte) (this.surfs.get(min_ind).mat.diff_g*255*(1-lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]));
 	        		
-	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+2] = (byte) (this.surfs.get(min_ind).mat.diff_b*255*lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
+	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+2] = (byte) (this.surfs.get(min_ind).mat.diff_b*255*(1-lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]));
         		}
         		else {
              		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.bg_r*255);
@@ -165,7 +165,7 @@ class Scene{
         	}
         }
 
-      System.out.println(maxlight[1]);
+      System.out.println(maxlight[0]);
      //maxlight =1;
 //      for(int k=0; k< rgbData.length;k++) {
 //       maxlight=Math.max(maxlight, rgbData[k]);
@@ -173,8 +173,8 @@ class Scene{
        for(int k=0; k< rgbData.length;k++) {
     	 //System.out.println(rgbData[k]);
     	 //  if(lightInt[k] > 0){
-    		   //rgbData[k] =(byte) (((double)rgbData[k])*((double)1/this.lights.size()));
-    		   rgbData[3*k+1] =(byte) ((rgbData[3*k])*(1/(maxlight[1])));
+    		   //rgbData[k] =(byte) (((double)rgbData[k])*((double)1/(double)this.lights.size()));
+    	  ///rgbData[k] =(byte) ((rgbData[k])*(1/(maxlight[1])));
     		 //  rgbData[3*k+2] =(byte) ((rgbData[3*k+2])*(1/(maxlight[2])));
     	  // }
     	 //System.out.println(rgbData[k]);
