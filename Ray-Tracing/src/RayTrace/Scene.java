@@ -57,6 +57,8 @@ class Scene{
         double[] maxlight =new double[3];
         Vector dir1,dir2;
         Rect rect;
+
+        int cnt=0;
         
         
         for(i=0;i<imageHeight;i++) {
@@ -80,7 +82,7 @@ class Scene{
         			for(int k=0; k< this.lights.size();k++) {
         				//for(int n=0;n<=this.lights.get(k).radius)
         				lightray = new Ray(this.lights.get(k).pos, new Vector(this.lights.get(k).pos,camray.getPos(min_val)),this.lights.get(k));
-        				if(this.rays_num == 1) {  //hard shadows only
+        				if(this.rays_num == 1) {  //hard shadows only 
 	        				
 	        				temp = Double.POSITIVE_INFINITY;
 	        				for(int m=0; m<this.surfs.size();m++) {
@@ -101,19 +103,20 @@ class Scene{
 	        					maxlight[2] = Math.max(maxlight[2], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
 	        				}
 	        				else { //surface is obscured from light source
-//	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] *= lightray.light.r*(1-lightray.light.shadow_intens);
-//	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3] /= 2;
-//	        					maxlight[0] = Math.max(maxlight[0], lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
-//	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] *= lightray.light.g*(1-lightray.light.shadow_intens);
-//	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] /= 2;
-//	        					maxlight[1] = Math.max(maxlight[1], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
-//	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] *= lightray.light.b*(1-lightray.light.shadow_intens);
-//	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] /= 2;
-//	        					maxlight[2] = Math.max(maxlight[2], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
+	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] *= lightray.light.r*(1-lightray.light.shadow_intens);
+	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3] /= 2;
+	        					maxlight[0] = Math.max(maxlight[0], lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
+	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] *= lightray.light.g*(1-lightray.light.shadow_intens);
+	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] /= 2;
+	        					maxlight[1] = Math.max(maxlight[1], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
+	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] *= lightray.light.b*(1-lightray.light.shadow_intens);
+	        					//lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] /= 2;
+	        					maxlight[2] = Math.max(maxlight[2], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
 	        				}
         				}
         				else { //using soft shadows
         					dir1 = lightray.direct.getPerp();
+        					
         					dir2 = lightray.direct.cross(dir1);
         					rect = new Rect(camray.getPos(min_val),dir1,dir2,lightray.light.radius,this.rays_num,lightray.light);
         					for(int x=0;x<this.rays_num;x++) {
@@ -123,37 +126,31 @@ class Scene{
         								temp = Math.min(this.surfs.get(m).intersect(rect.raygrid[x][y]),temp);
         							}
         							if(new Vector(camray.getPos(min_val),rect.raygrid[x][y].getPos(temp)).size() < 0.001) {  //surface isn't obscured from light source
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] += rect.raygrid[x][y].light.r;
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] /= 2;
-        	        					 
-        	        					//maxlight = Math.max(maxlight, lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] += rect.raygrid[x][y].light.g;
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] /= 2;
-        	        					//maxlight = Math.max(maxlight, lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] += rect.raygrid[x][y].light.b;
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] /= 2;
-        	        					//maxlight = Math.max(maxlight, lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
+        	        					cnt++;
+
         	        				}
-        	        				else { //surface is obscured from light source
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] += rect.raygrid[x][y].light.r*(1-rect.raygrid[x][y].light.shadow_intens);
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] /= 2;
-        	        					//maxlight = Math.max(maxlight, lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] += rect.raygrid[x][y].light.g*(1-rect.raygrid[x][y].light.shadow_intens);
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] /= 2;
-        	        					//maxlight = Math.max(maxlight, lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] += rect.raygrid[x][y].light.b*(1-rect.raygrid[x][y].light.shadow_intens);
-        	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] /= 2;
-        	        					//maxlight = Math.max(maxlight, lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
-        	        				}
+
         						}
         					}
+        					temp = (double) this.rays_num*this.rays_num;
+        					temp = (((double)(cnt)+(temp-(double)(cnt))*((double)lightray.light.shadow_intens))/temp);
+        					cnt=0;
+        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] *= lightray.light.r*temp;
+//        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] /= 2;
+        					maxlight[0] = Math.max(maxlight[0], lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
+        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] *= lightray.light.g*temp;
+//        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] /= 2;
+        					maxlight[1] = Math.max(maxlight[1], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]);
+        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] *= lightray.light.b*temp;
+//        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] /= 2;
+        					maxlight[2] = Math.max(maxlight[2], lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]);
         				}
         			}
-	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.surfs.get(min_ind).mat.diff_r*255*(1-lightInt[(j+(imageHeight-1-i)*imageWidth)*3]));
+	        		lightInt[(j+(imageHeight-1-i)*imageWidth)*3] =  (this.surfs.get(min_ind).mat.diff_r*255*(lightInt[(j+(imageHeight-1-i)*imageWidth)*3]));
 	        		
-	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+1] = (byte) (this.surfs.get(min_ind).mat.diff_g*255*(1-lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]));
+	        		lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] = (this.surfs.get(min_ind).mat.diff_g*255*(lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1]));
 	        		
-	        		rgbData[(j+(imageHeight-1-i)*imageWidth)*3+2] = (byte) (this.surfs.get(min_ind).mat.diff_b*255*(1-lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]));
+	        		lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] =  (this.surfs.get(min_ind).mat.diff_b*255*(lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2]));
         		}
         		else {
              		rgbData[(j+(imageHeight-1-i)*imageWidth)*3] = (byte) (this.bg_r*255);
@@ -166,14 +163,16 @@ class Scene{
         }
 
       System.out.println(maxlight[0]);
-     //maxlight =1;
-//      for(int k=0; k< rgbData.length;k++) {
-//       maxlight=Math.max(maxlight, rgbData[k]);
-//      }
+    // maxlight[0] =0;
+      for(int k=0; k< rgbData.length/3;k++) {
+       maxlight[0]=Math.max(maxlight[0], lightInt[3*k]);
+       maxlight[1]=Math.max(maxlight[1], lightInt[3*k+1]);
+       maxlight[2]=Math.max(maxlight[2], lightInt[3*k+2]);
+      }
        for(int k=0; k< rgbData.length;k++) {
     	 //System.out.println(rgbData[k]);
     	 //  if(lightInt[k] > 0){
-    		   //rgbData[k] =(byte) (((double)rgbData[k])*((double)1/(double)this.lights.size()));
+    		   rgbData[k] =(byte) ((lightInt[k])*255/maxlight[k % 3]);
     	  ///rgbData[k] =(byte) ((rgbData[k])*(1/(maxlight[1])));
     		 //  rgbData[3*k+2] =(byte) ((rgbData[3*k+2])*(1/(maxlight[2])));
     	  // }
