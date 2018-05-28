@@ -18,6 +18,13 @@ class Vector{
                       this.x*other.y - this.y*other.x);
     }
     
+    public Vector prod(float scalar){
+        return new Vector(scalar*this.x,
+                          scalar*this.y,
+                          scalar*this.z);
+    }
+
+    
     public Vector plus(Vector other){
         return new Vector(this.x + other.x,
                       this.y + other.y,
@@ -30,5 +37,7 @@ class Vector{
                       this.z - other.z);
     }
     
-    
+    public String toString(){
+        return String.format("%f %f %f", x, y, z);
+    }
 }
