@@ -99,6 +99,7 @@ class Scene{
         				lightray = new Ray(this.lights.get(k).pos, new Vector(this.lights.get(k).pos,camray.getPos(min_val)),this.lights.get(k));
         				returning_ray = camray.direct.minus(normal.prod(normal.dot(camray.direct)));
         				returning_ray = normal.prod(-normal.dot(camray.direct)).plus(returning_ray);
+        				returning_ray = returning_ray.prod(1/returning_ray.size());
         				alpha = returning_ray.dot(lightray.direct);
 
         				alpha = Math.pow(Math.abs(alpha), this.surfs.get(min_ind).mat.phong);
@@ -113,14 +114,15 @@ class Scene{
 	        				if(new Vector(camray.getPos(min_val),lightray.getPos(temp)).size() < 0.001) {  //surface isn't obscured from light source
 	        					//System.out.println("wow");
 	        					cnt++;
-	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] = +lightray.light.r;
+	        					temp = normal.dot(lightray.direct)*-1;
+	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] = +lightray.light.r*temp;
 	        					
 	        					
 	        					 
-	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] = +lightray.light.g;
+	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+1] = +lightray.light.g*temp;
 	        	
 	        					
-	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] = +lightray.light.b;
+	        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3+2] = +lightray.light.b*temp;
 	        
 	        				
 	        					//specular light
@@ -168,7 +170,8 @@ class Scene{
         					}
         					temp = (double) this.rays_num*this.rays_num;
         					temp = (((double)(cnt)+(temp-(double)(cnt))*((double)lightray.light.shadow_intens))/temp);
-        					
+        					temp = Math.abs(temp*normal.dot(lightray.direct));
+        					//System.out.println(temp);
         					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] += lightray.light.r*temp;
 //        					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] /= 2;
         					//maxlight[0] = Math.max(maxlight[0], lightInt[(j+(imageHeight-1-i)*imageWidth)*3]);
