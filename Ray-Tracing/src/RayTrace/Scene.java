@@ -169,7 +169,7 @@ class Scene{
         						}
         					}
         					temp = (double) this.rays_num*this.rays_num;
-        					temp = (((double)(cnt)+(temp-(double)(cnt))*((double)lightray.light.shadow_intens))/temp);
+        					temp = (((double)(cnt)+(temp-(double)(cnt))*((double)1.0-lightray.light.shadow_intens))/temp);
         					temp = Math.abs(temp*normal.dot(lightray.direct));
         					//System.out.println(temp);
         					lightInt[(j+(imageHeight-1-i)*imageWidth)*3] += lightray.light.r*temp;
@@ -239,7 +239,7 @@ class Scene{
     	 //System.out.println(rgbData[k]);
     	 //  if(lightInt[k] > 0){
     	   if(maxlight[1] > 0) {
-    		   rgbData[k] =(byte) Math.min(255,((1*lightInt[k]/(this.lights.size()-1))+lightInt_spec[k]/(this.lights.size()-1)));
+    		   rgbData[k] =(byte) Math.min(255,((1*lightInt[k])+lightInt_spec[k]));
     	   }
     	   else {
     		   rgbData[k] =(byte) Math.min(255,((lightInt[k]/this.lights.size())));
