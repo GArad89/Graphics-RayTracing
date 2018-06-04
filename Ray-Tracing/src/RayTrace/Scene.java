@@ -162,6 +162,8 @@ class Scene{
         Vector p_0 = this.cam.look_v.prod(this.cam.screen_dist);  //the vector to pixel[0,0]
         //mod = this.cam.look.minus(this.cam.pos).size();
         p_0 = p_0.plus(camleft.prod((double)(0.5*this.cam.screen_width)));
+        int perc_pixs=imageHeight*imageWidth/100;
+        int pixs=0;
         double screen_height = ((double)imageHeight/(double)imageWidth)*this.cam.screen_width;
         p_0 = p_0.plus(this.cam.up.prod((double)(-0.5*screen_height))); //this is a vector from pos to p_0. NOT the coordinates of p_0
         Vector j_step = camleft.prod((double)((-this.cam.screen_width)/((double)imageWidth*sample_lev))); 
@@ -190,13 +192,19 @@ class Scene{
                         lightInt[ind] += rgb[0];
                         lightInt[ind+1] += rgb[1];
                         lightInt[ind+2] += rgb[2];
+                        
+                        
                     }
                 }
+                pixs++;
+                if(pixs% perc_pixs == 0)
+                    System.out.print('.');
                 lightInt[ind] /= sample_lev2;
                 lightInt[ind+1] /= sample_lev2;
                 lightInt[ind+2] /=  sample_lev2;
             }
         }
+        System.out.println('.');
        for(int k=0; k< rgbData.length;k++){
            rgbData[k] =(byte) (255*(Math.min(1, lightInt[k])));
        }
