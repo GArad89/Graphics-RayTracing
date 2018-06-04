@@ -180,17 +180,17 @@ class Scene{
                                 }
                             }
 
-                            r +=  (this.surfs.get(min_ind).mat.diff_r*255*(r));
-                            g += (this.surfs.get(min_ind).mat.diff_g*255*(g));
-                            b +=  (this.surfs.get(min_ind).mat.diff_b*255*(b));
-                            r +=  (this.surfs.get(min_ind).mat.spec_r*255*(r_spec));
-                            g += (this.surfs.get(min_ind).mat.spec_g*255*(g_spec));
-                            b +=  (this.surfs.get(min_ind).mat.spec_b*255*(b_spec));
+                            r =  (this.surfs.get(min_ind).mat.diff_r*255*(r));
+                            g = (this.surfs.get(min_ind).mat.diff_g*255*(g));
+                            b =  (this.surfs.get(min_ind).mat.diff_b*255*(b));
+                            r_spec =  (this.surfs.get(min_ind).mat.spec_r*255*(r_spec));
+                            g_spec = (this.surfs.get(min_ind).mat.spec_g*255*(g_spec));
+                            b_spec =  (this.surfs.get(min_ind).mat.spec_b*255*(b_spec));
                         }
                         else {
-                            /*lightInt[ind] +=  (this.bg_r*255);
-                            lightInt[ind+1] += (this.bg_g*255);
-                            lightInt[ind+2] +=  (this.bg_b*255);*/
+                            r =  (this.bg_r*255);
+                            g = (this.bg_g*255);
+                            b =  (this.bg_b*255);
                         }
                         min_ind =-1;
                         min_val = Double.POSITIVE_INFINITY;
