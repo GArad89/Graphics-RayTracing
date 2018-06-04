@@ -106,79 +106,46 @@ class Scene{
                                 
                                 alpha = Math.pow(Math.abs(alpha), this.surfs.get(min_ind).mat.phong);
                                 
-                                if(this.rays_num == 1) {  //hard shadows only 
+                                dir1 = lightray.direct.getPerp();
 
-                                    temp = Double.POSITIVE_INFINITY;
-                                    for(int m=0; m<this.surfs.size();m++) {
-                                        temp = Math.min(this.surfs.get(m).intersect(lightray),temp);
-                                    }
-                                    if(new Vector(camray.getPos(min_val),lightray.getPos(temp)).size() < 0.001) {  //surface isn't obscured from light source
-                                        //System.out.println("wow");
-                                        cnt++;
-                                        temp = normal.dot(lightray.direct)*-1;
-                                        r += lightray.light.r*temp;
-                                        g += lightray.light.g*temp;
-                                        b += lightray.light.b*temp;
+                                dir2 = lightray.direct.cross(dir1);
+                                rect = new Rect(camray.getPos(min_val),dir1,dir2,lightray.light.radius,this.rays_num,lightray.light);
+                                for(int x=0;x<this.rays_num;x++) {
+                                    for(int y=0;y<this.rays_num;y++) {
+                                        temp = Double.POSITIVE_INFINITY;
+                                        for(int m=0;m<this.surfs.size();m++) {
+                                            temp = Math.min(this.surfs.get(m).intersect(rect.raygrid[x][y]),temp);
+                                        }
+                                        if(new Vector(camray.getPos(min_val),rect.raygrid[x][y].getPos(temp)).size() < 0.001) {  //surface isn't obscured from light source
+                                            cnt++;
 
-                                        //specular light
-                                        r_spec += lightray.light.spec_intens*lightray.light.r*alpha;
-                                        g_spec += lightray.light.spec_intens*lightray.light.g*alpha;
-                                        b_spec += lightray.light.spec_intens*lightray.light.b*alpha;
-                                    }
-                                    else { //surface is obscured from light source
-                                        r += lightray.light.r*(1-lightray.light.shadow_intens);
-                                        //lightInt[ind] /= 2;
-                                        //maxlight[0] = Math.max(maxlight[0], lightInt[ind]);
-                                        g += lightray.light.g*(1-lightray.light.shadow_intens);
-                                        //lightInt[ind+1] /= 2;
-                                        //maxlight[1] = Math.max(maxlight[1], lightInt[ind+1]);
-                                        b += lightray.light.b*(1-lightray.light.shadow_intens);
-                                        //lightInt[ind+2] /= 2;
-                                        //maxlight[2] = Math.max(maxlight[2], lightInt[ind+2]);
-
-                                    }
-                                }
-                                else { //using soft shadows
-                                    dir1 = lightray.direct.getPerp();
-
-                                    dir2 = lightray.direct.cross(dir1);
-                                    rect = new Rect(camray.getPos(min_val),dir1,dir2,lightray.light.radius,this.rays_num,lightray.light);
-                                    for(int x=0;x<this.rays_num;x++) {
-                                        for(int y=0;y<this.rays_num;y++) {
-                                            temp = Double.POSITIVE_INFINITY;
-                                            for(int m=0;m<this.surfs.size();m++) {
-                                                temp = Math.min(this.surfs.get(m).intersect(rect.raygrid[x][y]),temp);
-                                            }
-                                            if(new Vector(camray.getPos(min_val),rect.raygrid[x][y].getPos(temp)).size() < 0.001) {  //surface isn't obscured from light source
-                                                cnt++;
-
-                                            }
                                         }
                                     }
-                                    temp = (double) this.rays_num*this.rays_num;
-                                    temp = (((double)(cnt)+(temp-(double)(cnt))*((double)1.0-lightray.light.shadow_intens))/temp);
-                                    temp = Math.abs(temp*normal.dot(lightray.direct));
-                                    //System.out.println(temp);
-                                    r += lightray.light.r*temp;
-        //        					lightInt[ind] /= 2;
-                                    //maxlight[0] = Math.max(maxlight[0], lightInt[ind]);
-                                    g += lightray.light.g*temp;
-        //        					lightInt[ind+1] /= 2;
-                                    //maxlight[1] = Math.max(maxlight[1], lightInt[ind+1]);
-                                    b += lightray.light.b*temp;
-        //        					lightInt[ind+2] /= 2;
-                                    //maxlight[2] = Math.max(maxlight[2], lightInt[ind+2]);
-                                    //if(cnt == this.rays_num*this.rays_num ) {
-                                        //System.out.println("wow");
-                                    temp = (double) this.rays_num*this.rays_num;
-                                    temp = (double)cnt/temp;
-                                    r_spec += lightray.light.spec_intens*lightray.light.r*alpha*temp;
-                                    g_spec += lightray.light.spec_intens*lightray.light.g*alpha*temp;
-                                    g_spec += lightray.light.spec_intens*lightray.light.b*alpha*temp;
-
-                                    cnt=0;
                                 }
+                                temp = (double) this.rays_num*this.rays_num;
+                                temp = (((double)(cnt)+(temp-(double)(cnt))*((double)1.0-lightray.light.shadow_intens))/temp);
+                                temp = Math.abs(temp*normal.dot(lightray.direct));
+                                //System.out.println(temp);
+                                r += lightray.light.r*temp;
+    //        					lightInt[ind] /= 2;
+                                //maxlight[0] = Math.max(maxlight[0], lightInt[ind]);
+                                g += lightray.light.g*temp;
+    //        					lightInt[ind+1] /= 2;
+                                //maxlight[1] = Math.max(maxlight[1], lightInt[ind+1]);
+                                b += lightray.light.b*temp;
+    //        					lightInt[ind+2] /= 2;
+                                //maxlight[2] = Math.max(maxlight[2], lightInt[ind+2]);
+                                //if(cnt == this.rays_num*this.rays_num ) {
+                                    //System.out.println("wow");
+                                temp = (double) this.rays_num*this.rays_num;
+                                temp = (double)cnt/temp;
+                                r_spec += lightray.light.spec_intens*lightray.light.r*alpha*temp;
+                                g_spec += lightray.light.spec_intens*lightray.light.g*alpha*temp;
+                                b_spec += lightray.light.spec_intens*lightray.light.b*alpha*temp;
+
+                                cnt=0;
                             }
+                            
 
                             r =  (this.surfs.get(min_ind).mat.diff_r*255*(r));
                             g = (this.surfs.get(min_ind).mat.diff_g*255*(g));
