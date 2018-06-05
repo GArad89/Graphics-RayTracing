@@ -123,7 +123,13 @@ class Scene{
 
                         if(new Vector(camray.getPos(min_val),rect.raygrid[x][y].getPos(light_val)).size() > 0.001)  //object's surface is obscured from light source by the object itself
                         	light_total*= this.surfs.get(min_ind).mat.trans;
-                       
+                        else {
+                        	if(this.surfs.get(min_ind) instanceof Plane) {
+                        		if(Math.signum(camray.direct.dot(normal)) != Math.signum(lightray.direct.dot(normal))){ //object is a plane or triangle and the light is coming from the other side of the camera
+                        			light_total = 0;
+                        		}
+                        	}
+                        }
                         
                         cnt+= light_total;
                        
@@ -190,16 +196,7 @@ class Scene{
         Vector j_step = camleft.prod((double)((-this.cam.screen_width)/((double)imageWidth*sample_lev))); 
         Vector i_step = this.cam.up.prod((double)((screen_height)/((double)imageHeight*sample_lev))); 
         Ray camray = null;
-        Ray lightray = null;
-        double min_val=Double.POSITIVE_INFINITY;
-        double temp = 0;
-        double[] maxlight =new double[3];
-        Vector dir1,dir2;
-        Rect rect;
-        Vector normal=null;
-        Double alpha =0.0;
-        Vector returning_ray;
-        int cnt=0;
+
         Random rand = new Random();
         
         for(i=0;i<imageHeight;i++) {

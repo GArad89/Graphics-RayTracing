@@ -4,7 +4,7 @@ import java.lang.Math;
 class Triangle extends Plane{
     Vector v1, v2, v3;
     Vector n12, n23, n13;
-    double c12, c23, c13;
+
     double sign12, sign23, sign13;
     
     public Triangle(double x1, double y1, double z1,
@@ -23,16 +23,16 @@ class Triangle extends Plane{
         Vector center = v1.plus(v2).plus(v3).prod((double)1./3);
         
         this.n12 = v12.cross(this.normal);
-        this.c12 = n12.dot(v1);
-        this.sign12 = Math.signum(n12.dot(center) + c12);
+  
+        this.sign12 = Math.signum(n12.dot(v1.minus(center)));
         
         this.n23 = v23.cross(this.normal);
-        this.c23 = n23.dot(v2);
-        this.sign23 = Math.signum(v23.dot(center) + c23);
+
+        this.sign23 = Math.signum(n12.dot(v2.minus(center)));
         
         this.n13 = v13.cross(this.normal);
-        this.c13 = n13.dot(v1);
-        this.sign13 = Math.signum(v13.dot(center) + c13);
+   
+        this.sign13 = Math.signum(n13.dot(v3.minus(center)));
         
         
     }
@@ -41,9 +41,9 @@ class Triangle extends Plane{
     public double intersect(Ray ray){
         double t=super.intersect(ray);
         Vector v=ray.src.plus(ray.direct.prod(t));
-        if((Math.signum(n12.dot(v) + c12) == -sign12) ||
-           (Math.signum(n23.dot(v) + c23) == -sign23) ||
-           (Math.signum(n13.dot(v) + c13) == -sign13))
+        if((Math.signum(n12.dot(v1.minus(v))) == -sign12) ||
+           (Math.signum(n23.dot(v2.minus(v))) == -sign23) ||
+           (Math.signum(n13.dot(v3.minus(v))) == -sign13))
            return Double.POSITIVE_INFINITY;
         return t;
     }
