@@ -44,7 +44,8 @@ class Scene{
             return rgb;
         }
         Vector dir1, dir2;
-        int min_ind=-1, cnt=0;
+        int min_ind=-1;
+        double cnt=0;
         double temp, min_val=Double.POSITIVE_INFINITY, alpha;
         double r=0, g=0, b=0, r_spec=0, g_spec=0, b_spec=0, reflect_r=0, reflect_g=0, reflect_b=0;
         double bg_r=this.bg_r, bg_g=this.bg_g, bg_b=this.bg_b;
@@ -71,10 +72,8 @@ class Scene{
             normal = normal.prod(1/normal.size()); //make sure it is normalized
             mat = this.surfs.get(min_ind).mat;
             trans = mat.trans;
+            double light_val,light_total=1,temp2;
             double bg_rgb[], reflect_rgb[];
-            double light_trans = 1; 
-            double trans_total =0; 
-            double light_temp; 
             if(trans < 1){
                 bg_rgb = trace(new Ray(pos, camray.direct), rec-1);
                 bg_r = bg_rgb[0];
@@ -104,26 +103,37 @@ class Scene{
                 rect = new Rect(pos,dir1,dir2,lightray.light.radius,this.rays_num,lightray.light);
                 for(int x=0;x<this.rays_num;x++) {
                     for(int y=0;y<this.rays_num;y++) {
-                        // temp = Double.POSITIVE_INFINITY; 
-                        light_temp = surfs.get(min_ind).intersect(rect.raygrid[x][y]); 
-                        for(int m=0;m<this.surfs.size();m++) { 
-                            //temp = Math.min(this.surfs.get(m).intersect(rect.raygrid[x][y]),temp); 
-                          temp = this.surfs.get(m).intersect(rect.raygrid[x][y]); 
-                          if(temp >= 0 && temp < light_temp) { 
-                            light_trans*= this.surfs.get(m).mat.trans; 
-                          } 
-                        } 
-                        if(light_trans > 0.001) {  //surface isn't obscured from light source 
-                            cnt++; 
-     
-                        } 
-                        trans_total += light_trans; 
-                        light_trans = 1; 
-                    } 
+                        temp2 = Double.POSITIVE_INFINITY;
+                        light_val = this.surfs.get(min_ind).intersect(rect.raygrid[x][y]);
+                        for(int m=0;m<this.surfs.size();m++) {
+                            temp = this.surfs.get(m).intersect(rect.raygrid[x][y]);
+                            if(temp >= 0) {
+                            	temp2 = Math.min(temp2, temp);
+                                if( temp < light_val) {
+                                	light_total*= this.surfs.get(m).mat.trans;
+//                                	if(light_total > 0)
+//                                		System.out.println(light_total);
+                                	if(light_total == 0) {
+                                		break;
+                                	}
+                                }
+                            }
+
+                        }
+
+                        if(new Vector(camray.getPos(min_val),rect.raygrid[x][y].getPos(light_val)).size() > 0.001)  //object's surface is obscured from light source by the object itself
+                        	light_total*= this.surfs.get(min_ind).mat.trans;
+                       
+                        
+                        cnt+= light_total;
+                       
+                        light_total = 1;
+                    }
                 }
                 temp = (((double)(cnt)+(rays_num2-(double)(cnt))*((double)1.0-lightray.light.shadow_intens))/rays_num2);
-                temp = Math.abs(temp*normal.dot(lightray.direct))*trans_total/(rays_num2); ;
-                //System.out.println(temp);
+     
+                temp = Math.abs(temp*normal.dot(lightray.direct));
+              
                 r += lightray.light.r*temp;
     //        					lightInt[ind] /= 2;
                 //maxlight[0] = Math.max(maxlight[0], lightInt[ind]);
@@ -166,11 +176,12 @@ class Scene{
     public void Render(byte[] rgbData, int imageWidth,int imageHeight) {
         int i=0, j=0, si=0, sj=0;
         double[] lightInt = new double[rgbData.length];
-        double[] lightInt_spec = new double[rgbData.length];
-        int[] ignore = new int[this.surfs.size()];
+       // double mod=0; //need a better name
         Vector camleft = this.cam.look_v.cross(this.cam.up); //the "left direction" of the camera.
         camleft = camleft.prod(1/camleft.size()); //normalize camleft
+       // Vector pixelCord= null; //the coordinate of the pixel (bottom left corner for now, no supersampling yet)
         Vector p_0 = this.cam.look_v.prod(this.cam.screen_dist);  //the vector to pixel[0,0]
+        //mod = this.cam.look.minus(this.cam.pos).size();
         p_0 = p_0.plus(camleft.prod((double)(0.5*this.cam.screen_width)));
         int perc_pixs=imageHeight*imageWidth/100;
         int pixs=0;
@@ -179,10 +190,17 @@ class Scene{
         Vector j_step = camleft.prod((double)((-this.cam.screen_width)/((double)imageWidth*sample_lev))); 
         Vector i_step = this.cam.up.prod((double)((screen_height)/((double)imageHeight*sample_lev))); 
         Ray camray = null;
+        Ray lightray = null;
+        double min_val=Double.POSITIVE_INFINITY;
+        double temp = 0;
+        double[] maxlight =new double[3];
+        Vector dir1,dir2;
+        Rect rect;
+        Vector normal=null;
+        Double alpha =0.0;
+        Vector returning_ray;
+        int cnt=0;
         Random rand = new Random();
-       
-        
-        
         
         for(i=0;i<imageHeight;i++) {
         	for(j=0;j<imageWidth;j++) {
@@ -197,11 +215,6 @@ class Scene{
                         lightInt[ind+2] += rgb[2];
                         
                         
-                    	camray = new Ray(this.cam.pos,p_0.plus(j_step.prod((double)j*sample_lev+sj+rand.nextDouble()).plus(i_step.prod((double)i*sample_lev+si+rand.nextDouble()))));
-                    	ray_cast(camray,lightInt,lightInt_spec,ind,1,ignore);
-                    	for(int ig=0;ig< this.surfs.size();ig++) {
-                    		ignore[ig] = 0;
-                    	}
                     }
                 }
                 pixs++;
@@ -211,22 +224,7 @@ class Scene{
                 lightInt[ind+1] /= sample_lev2;
                 lightInt[ind+2] /=  sample_lev2;
             }
-                lightInt[ind] /= sample_lev*sample_lev;
-                lightInt[ind+1] /= sample_lev*sample_lev;
-                lightInt[ind+2] /=  sample_lev*sample_lev;
-                lightInt_spec[ind] /= sample_lev*sample_lev;
-                lightInt_spec[ind+1] /= sample_lev*sample_lev;
-                lightInt_spec[ind+2] /=  sample_lev*sample_lev;
-        	}
         }
-                    	
-                    	
-      System.out.println(this.bg_b);
-      
-       for(int k=0; k< rgbData.length;k++) {
-    		   rgbData[k] =(byte) Math.min(255,((1*lightInt[k])+lightInt_spec[k]));
-
-       }
         System.out.println('.');
        for(int k=0; k< rgbData.length;k++){
            rgbData[k] =(byte) (255*(Math.min(1, lightInt[k])));
@@ -234,118 +232,4 @@ class Scene{
       
     }
     
-        
-public void ray_cast(Ray camray, double[] lightInt,double[] lightInt_spec,int ind,double transp,int[] ignore) {
-	
-	double r=0, g=0, b=0, r_spec=0, g_spec=0, b_spec=0;
-   	double temp = 0,min_val =Double.POSITIVE_INFINITY;;
-    int min_ind=-1;
-    Ray lightray = null;
-    Vector dir1,dir2;
-    Rect rect;
-    Vector normal=null;
-    Double alpha =0.0;
-    Vector returning_ray;
-    int cnt=0;
-        
-    for(int k=0;k< this.surfs.size();k++) {
-        temp = this.surfs.get(k).intersect(camray);
-        if(temp >= 0 && temp < min_val && ignore[k] == 0) {
-            min_ind = k;
-            min_val = temp;
-        }
-    }
-
-    if(min_ind > -1) {
-    	
-    	//adding transparency color
-    	if(this.surfs.get(min_ind).mat.trans > 0) {
-    		ignore[min_ind] = 1;
-    		ray_cast(camray,lightInt,lightInt_spec,ind,transp*this.surfs.get(min_ind).mat.trans,ignore);
-    		ignore[min_ind] = 0;
-    	}
-        normal = this.surfs.get(min_ind).normal(camray.direct.prod(min_val).plus(camray.src));
-        normal = normal.prod(1/normal.size()); //make sure it is normalized
-
-        for(int k=0; k<this.lights.size();k++) {
-        	
-            lightray = new Ray(this.lights.get(k).pos, new Vector(this.lights.get(k).pos,camray.getPos(min_val)),this.lights.get(k));
-            returning_ray = camray.direct.minus(normal.prod(normal.dot(camray.direct)));
-            returning_ray = normal.prod(-normal.dot(camray.direct)).plus(returning_ray);
-            returning_ray = returning_ray.prod(1/returning_ray.size());
-            alpha = returning_ray.dot(lightray.direct);      
-            alpha = Math.pow(Math.abs(alpha), this.surfs.get(min_ind).mat.phong);        
-            dir1 = lightray.direct.getPerp();
-            dir2 = lightray.direct.cross(dir1);
-            rect = new Rect(camray.getPos(min_val),dir1,dir2,lightray.light.radius,this.rays_num,lightray.light);
-            double light_trans = 1;
-            double trans_total =0;
-            double light_temp;
-            
-            for(int x=0;x<this.rays_num;x++) {
-                for(int y=0;y<this.rays_num;y++) {
-                   // temp = Double.POSITIVE_INFINITY;
-                    light_temp = surfs.get(min_ind).intersect(rect.raygrid[x][y]);
-                    for(int m=0;m<this.surfs.size();m++) {
-                        //temp = Math.min(this.surfs.get(m).intersect(rect.raygrid[x][y]),temp);
-                    	temp = this.surfs.get(m).intersect(rect.raygrid[x][y]);
-                    	if(temp >= 0 && temp < light_temp) {
-                    		light_trans*= this.surfs.get(m).mat.trans;
-                    	}
-                    }
-                    if(light_trans > 0.001) {  //surface isn't obscured from light source
-                        cnt++;
-
-                    }
-                    trans_total += light_trans;
-                    light_trans = 1;
-                }
-            }
-            
-            temp = (double) this.rays_num*this.rays_num;
-            temp = (((double)(cnt)+(temp-(double)(cnt))*((double)1.0-lightray.light.shadow_intens))/temp);
-            temp = Math.abs(temp*normal.dot(lightray.direct))*trans_total/((double)this.rays_num*this.rays_num);
-            //System.out.println(temp);
-            
-            r += lightray.light.r*temp;
-            g += lightray.light.g*temp;
-            b += lightray.light.b*temp;
-
-            temp = (double) this.rays_num*this.rays_num;
-            temp = (double)cnt/temp;
-            r_spec += lightray.light.spec_intens*lightray.light.r*alpha*temp;
-            g_spec += lightray.light.spec_intens*lightray.light.g*alpha*temp;
-            b_spec += lightray.light.spec_intens*lightray.light.b*alpha*temp;
-
-            cnt=0;
-        }
-        
-
-        r =  (this.surfs.get(min_ind).mat.diff_r*255*(r))*transp*(1-this.surfs.get(min_ind).mat.trans);
-        g = (this.surfs.get(min_ind).mat.diff_g*255*(g))*transp*(1-this.surfs.get(min_ind).mat.trans);
-        b =  (this.surfs.get(min_ind).mat.diff_b*255*(b))*transp*(1-this.surfs.get(min_ind).mat.trans);
-        r_spec =  (this.surfs.get(min_ind).mat.spec_r*255*(r_spec))*transp*(1-this.surfs.get(min_ind).mat.trans);
-        g_spec = (this.surfs.get(min_ind).mat.spec_g*255*(g_spec))*transp*(1-this.surfs.get(min_ind).mat.trans);
-        b_spec =  (this.surfs.get(min_ind).mat.spec_b*255*(b_spec))*transp*(1-this.surfs.get(min_ind).mat.trans);
-    }
-    else {
-        r =  (this.bg_r*255);
-        g = (this.bg_g*255);
-        b =  (this.bg_b*255);
-    }
-    min_ind =-1;
-    min_val = Double.POSITIVE_INFINITY;
-    lightInt[ind] += r;
-    lightInt[ind+1] += g;
-    lightInt[ind+2] += b;
-    lightInt_spec[ind] += r_spec;
-    lightInt_spec[ind+1] += g_spec;
-    lightInt_spec[ind+2] += b_spec;
-
-   }
 }
-
-
-                
-
-        	
