@@ -72,6 +72,9 @@ class Scene{
             mat = this.surfs.get(min_ind).mat;
             trans = mat.trans;
             double bg_rgb[], reflect_rgb[];
+            double light_trans = 1; 
+            double trans_total =0; 
+            double light_temp; 
             if(trans < 1){
                 bg_rgb = trace(new Ray(pos, camray.direct), rec-1);
                 bg_r = bg_rgb[0];
@@ -101,17 +104,25 @@ class Scene{
                 rect = new Rect(pos,dir1,dir2,lightray.light.radius,this.rays_num,lightray.light);
                 for(int x=0;x<this.rays_num;x++) {
                     for(int y=0;y<this.rays_num;y++) {
-                        temp = Double.POSITIVE_INFINITY;
-                        for(int m=0;m<this.surfs.size();m++) {
-                            temp = Math.min(this.surfs.get(m).intersect(rect.raygrid[x][y]),temp);
-                        }
-                        if(new Vector(camray.getPos(min_val),rect.raygrid[x][y].getPos(temp)).size() < 0.001) {  //surface isn't obscured from light source
-                            cnt++;
-                        }
-                    }
+                        // temp = Double.POSITIVE_INFINITY; 
+                        light_temp = surfs.get(min_ind).intersect(rect.raygrid[x][y]); 
+                        for(int m=0;m<this.surfs.size();m++) { 
+                            //temp = Math.min(this.surfs.get(m).intersect(rect.raygrid[x][y]),temp); 
+                          temp = this.surfs.get(m).intersect(rect.raygrid[x][y]); 
+                          if(temp >= 0 && temp < light_temp) { 
+                            light_trans*= this.surfs.get(m).mat.trans; 
+                          } 
+                        } 
+                        if(light_trans > 0.001) {  //surface isn't obscured from light source 
+                            cnt++; 
+     
+                        } 
+                        trans_total += light_trans; 
+                        light_trans = 1; 
+                    } 
                 }
                 temp = (((double)(cnt)+(rays_num2-(double)(cnt))*((double)1.0-lightray.light.shadow_intens))/rays_num2);
-                temp = Math.abs(temp*normal.dot(lightray.direct));
+                temp = Math.abs(temp*normal.dot(lightray.direct))*trans_total/(rays_num2); ;
                 //System.out.println(temp);
                 r += lightray.light.r*temp;
     //        					lightInt[ind] /= 2;
@@ -168,16 +179,6 @@ class Scene{
         Vector j_step = camleft.prod((double)((-this.cam.screen_width)/((double)imageWidth*sample_lev))); 
         Vector i_step = this.cam.up.prod((double)((screen_height)/((double)imageHeight*sample_lev))); 
         Ray camray = null;
-        Ray lightray = null;
-        double min_val=Double.POSITIVE_INFINITY;
-        double temp = 0;
-        double[] maxlight =new double[3];
-        Vector dir1,dir2;
-        Rect rect;
-        Vector normal=null;
-        Double alpha =0.0;
-        Vector returning_ray;
-        int cnt=0;
         Random rand = new Random();
        
         
