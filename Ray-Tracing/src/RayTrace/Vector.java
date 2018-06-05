@@ -8,7 +8,14 @@ class Vector{
         this.y = y;
         this.z = z;
     }
+    
+    public Vector(Vector other){
+        this.x = other.x;
+        this.y = other.y;
+        this.z = other.z;
+    }
 
+    
     public Vector(Vector v1,Vector v2) { //v1,v2 are points in x,y,z coordinates
     	this.x = v2.x - v1.x;
     	this.y = v2.y - v1.y;
@@ -19,6 +26,8 @@ class Vector{
     	//this.y /=size;
     	//this.z /=size;
     }
+    
+    
     public double dot(Vector other){
         return this.x*other.x + this.y*other.y + this.z*other.z;
     }
