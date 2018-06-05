@@ -126,7 +126,7 @@ class Scene{
                         else {
                         	if(this.surfs.get(min_ind) instanceof Plane) {
                         		if(Math.signum(camray.direct.dot(normal)) != Math.signum(lightray.direct.dot(normal))){ //object is a plane or triangle and the light is coming from the other side of the camera
-                        			light_total = 0;
+                        			light_total *= this.surfs.get(min_ind).mat.trans;
                         		}
                         	}
                         }
@@ -136,7 +136,17 @@ class Scene{
                         light_total = 1;
                     }
                 }
-                temp = (((double)(cnt)+(rays_num2-(double)(cnt))*((double)1.0-lightray.light.shadow_intens))/rays_num2);
+                
+                //i'm not sure why it is happening but we get better results for a sphere without the shadow_intes part and better results for planes with that part.
+                int mod;
+                if(this.surfs.get(min_ind) instanceof Sphere) {
+                	mod =0 ;
+                }
+                else {
+                	mod = 1;
+                }
+                
+                temp = (((double)(cnt)+mod*(rays_num2-(double)(cnt))*((double)1.0-lightray.light.shadow_intens))/rays_num2);
      
                 temp = Math.abs(temp*normal.dot(lightray.direct));
               
@@ -205,7 +215,7 @@ class Scene{
                 int ind = (j+(imageHeight-1-i)*imageWidth)*3;                
                 for(si=0;si<sample_lev;si++){
                     for(sj=0;sj<sample_lev;sj++){
-                        camray = new Ray(this.cam.pos, p_0.plus(j_step.prod((double)j*sample_lev+sj+rand.nextDouble()).plus(i_step.prod((double)i*sample_lev+si+rand.nextDouble()))));
+                        camray = new Ray(this.cam.pos, p_0.plus(j_step.prod((double)j*sample_lev+sj+0.1+0.8*rand.nextDouble()).plus(i_step.prod((double)i*sample_lev+si+0.1+0.8*rand.nextDouble()))));
                         rgb = trace(camray, this.max_recurs);
                         lightInt[ind] += rgb[0];
                         lightInt[ind+1] += rgb[1];
