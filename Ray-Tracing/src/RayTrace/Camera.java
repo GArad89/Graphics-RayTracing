@@ -19,15 +19,7 @@ class Camera{
     	look_v = look_v.prod(1/look_v.size()); //normalize look_v
     	up = up.minus(look_v.prod(up.dot(look_v)/(look_v.dot(look_v))));  //remove the component of up in the direction of look_v
     	up = up.prod(1/up.size()); //normalize up
-//        this.pos_x = pos_x;
-//        this.pos_y = pos_y;
-//        this.pos_z = pos_z;
-//        this.look_x = look_x;
-//        this.look_y = look_y;
-//        this.look_z = look_z;
-//        this.up_x = up_x;
-//        this.up_y = up_y;
-//        this.up_z = up_z;
+
         this.screen_dist = screen_dist;
         this.screen_width = screen_width;
     }
