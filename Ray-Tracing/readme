@@ -1,0 +1,32 @@
+We have implemented Generic class which represents generic surface of the form f(x, y, z)=0.
+The function f is represented by composing recursively functions using operators (+-* root, sinus),
+where the the basic cases are f(x, y, z)=x, f(x, y, z)=y, f(x, y, z)=z and f(x, y, z)=const.
+The computing of an intersection of a ray with the surface is done by Newton-Raphson method.
+
+Using the generic class we have implemented the surfaces: ellipse, heart, cone, cylinder and wave.
+
+Those surfaces can be added to a scene file in this syntax:
+
+Ellipse:
+elp cx cy cz a b c material
+where cx cy cz are ellipse origin and a b c are its axes.
+
+Heart:
+hrt cx cy cz r material
+where cx cy cz are heart origin and r is its size.
+
+Cone:
+hrt cx cy cz tangens material
+where cx cy cz are cone origin and tangens is the tangens of the central angle.
+
+Cylinder:
+con cx cz material
+where cx cz are cylinder center and r is its radius.
+
+Wave:
+wav cx cy cz r a f
+where cx cz are sinus origin, r is its radius (width), a is its amplitus and f its frequncy
+
+The surfaces are rendered very slowly when using high parameter.
+
+An example for a scene file with those surfaces is found in gen.txt
