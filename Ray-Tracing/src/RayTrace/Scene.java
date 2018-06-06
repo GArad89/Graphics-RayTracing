@@ -38,6 +38,14 @@ class Scene{
         this.lights.add(light);
     }
     
+    /*  main logic method in the package. 
+     * the methods "shoot" camray and returns the rgb values calculated
+     * camray- the ray to be calculated (the ray source is not necessarily from the camera)
+     * rec - the ray current recursion value (max_recurs - x ,where x is how many rays "away" from the camera ray is the current ray)
+     * ignore - the ray will ignore the surface with this index value if there is intersection with the ray at distance < 0.001.
+     *          this makes sure the ray will "come out" if it's source is a bit inside the object.
+     * 
+     */
     public double[] trace(Ray camray, int rec,int ignore){
         if(rec == -1){
             double rgb[] = {this.bg_r, this.bg_g, this.bg_b};
@@ -56,25 +64,24 @@ class Scene{
         Vector normal, returning_ray, pos=null;
         Rect rect;
         for(int k=0;k< this.surfs.size();k++) {
-        	if( k != ignore) {
-	            temp = this.surfs.get(k).intersect(camray);
-	            if(temp >= 0 && temp < min_val) {
-	                min_ind = k;
-	                min_val = temp;
+        	
+            temp = this.surfs.get(k).intersect(camray);
+	            if( k == ignore && temp < 0.001) { //the ray is starting a bit "inside" the object it is returning from. 
+	            	temp = -1;
 	            }
-	        }
+            if(temp >= 0 && temp < min_val) {
+                min_ind = k;
+                min_val = temp;
+            }
+	        
         }
 
-    //        		pixelCord = camleft.prod(((double)j)/((double)imageWidth));
-    //        		pixelCord = pixelCord.plus(this.cam.up.prod(((double)i)/((double)imageHeight)));
-    //        		pixelCord = pixelCord.plus(this.cam.look.prod(this.cam.screen_dist));
-    //        		camray = new Ray()
+
         if(min_ind > -1) {
             pos = camray.getPos(min_val);
             normal = this.surfs.get(min_ind).normal(pos);
             normal = normal.prod(1/normal.size()); //make sure it is normalized
-//            if(min_ind == 1 && normal.y >= 0)
-//            	System.out.println(normal);
+
             mat = this.surfs.get(min_ind).mat;
             trans = mat.trans;
             double light_val,light_total=1,temp2;
@@ -96,7 +103,6 @@ class Scene{
             }
             
             for(int k=0; k<this.lights.size();k++) {
-                //for(int n=0;n<=this.lights.get(k).radius)
                 
                 lightray = new Ray(this.lights.get(k).pos, new Vector(this.lights.get(k).pos, pos), this.lights.get(k));
                 alpha = returning_ray.dot(lightray.direct);
@@ -116,8 +122,6 @@ class Scene{
                             	temp2 = Math.min(temp2, temp);
                                 if( temp < light_val) {
                                 	light_total*= this.surfs.get(m).mat.trans;
-//                                	if(light_total > 0)
-//                                		System.out.println(light_total);
                                 	if(light_total == 0) {
                                 		break;
                                 	}
@@ -157,16 +161,10 @@ class Scene{
                 temp = Math.abs(temp*normal.dot(lightray.direct));
               
                 r += lightray.light.r*temp;
-    //        					lightInt[ind] /= 2;
-                //maxlight[0] = Math.max(maxlight[0], lightInt[ind]);
                 g += lightray.light.g*temp;
-    //        					lightInt[ind+1] /= 2;
-                //maxlight[1] = Math.max(maxlight[1], lightInt[ind+1]);
                 b += lightray.light.b*temp;
-    //        					lightInt[ind+2] /= 2;
-                //maxlight[2] = Math.max(maxlight[2], lightInt[ind+2]);
-                //if(cnt == this.rays_num*this.rays_num ) {
-                    //System.out.println("wow");
+
+
                 temp = (double)cnt/rays_num2;
                 r_spec += lightray.light.spec_intens*lightray.light.r*alpha*temp;
                 g_spec += lightray.light.spec_intens*lightray.light.g*alpha*temp;
@@ -189,40 +187,49 @@ class Scene{
         }
         double comp_trans=1-trans;
         double rgb[] = {(r+r_spec)*comp_trans+bg_r*trans+reflect_r, (g+g_spec)*comp_trans+bg_g*trans+reflect_g, (b+b_spec)*comp_trans+bg_b*trans+reflect_b};
-        /*if(trans == 0.8)
-            for(int i=0;i<3;i++)
-               System.out.println(rgb[i]);*/
+
         return rgb;
     }
     
+    /*  main rendering method
+     *   rgbData - the array of the rgb values for the image's pixels.
+     *   imageWidth,imageHeight - the dimensions of the image
+     */
     public void Render(byte[] rgbData, int imageWidth,int imageHeight) {
-        int i=0, j=0, si=0, sj=0;
-        double[] lightInt = new double[rgbData.length];
-       // double mod=0; //need a better name
+        int i=0, j=0, si=0, sj=0;   //index variables
+        double[] lightInt = new double[rgbData.length];  //light Intensity array
+        Random rand = new Random();
+        
+        //setting up the coordinates for the image's screen
         Vector camleft = this.cam.look_v.cross(this.cam.up); //the "left direction" of the camera.
         camleft = camleft.prod(1/camleft.size()); //normalize camleft
-       // Vector pixelCord= null; //the coordinate of the pixel (bottom left corner for now, no supersampling yet)
         Vector p_0 = this.cam.look_v.prod(this.cam.screen_dist);  //the vector to pixel[0,0]
-        //mod = this.cam.look.minus(this.cam.pos).size();
         p_0 = p_0.plus(camleft.prod((double)(0.5*this.cam.screen_width)));
-        int perc_pixs=imageHeight*imageWidth/100;
-        int pixs=0;
         double screen_height = ((double)imageHeight/(double)imageWidth)*this.cam.screen_width;
         p_0 = p_0.plus(this.cam.up.prod((double)(-0.5*screen_height))); //this is a vector from pos to p_0. NOT the coordinates of p_0
         Vector j_step = camleft.prod((double)((-this.cam.screen_width)/((double)imageWidth*sample_lev))); 
         Vector i_step = this.cam.up.prod((double)((screen_height)/((double)imageHeight*sample_lev))); 
         Ray camray = null;
+        
+        //used to give progression output during the run
+        int perc_pixs=imageHeight*imageWidth/100;
+        int pixs=0;
 
-        Random rand = new Random();
+
+  
         
         for(i=0;i<imageHeight;i++) {
         	for(j=0;j<imageWidth;j++) {
                 double rgb[];
-                int ind = (j+(imageHeight-1-i)*imageWidth)*3;                
+                int ind = (j+(imageHeight-1-i)*imageWidth)*3;    
+                
+                //super sampling
                 for(si=0;si<sample_lev;si++){
                     for(sj=0;sj<sample_lev;sj++){
+                    	
+                    	//the "+0.1+0.8*rand.nextDouble()" part is for making sure the the sampling is done inside the sampling area and not on the edge
                         camray = new Ray(this.cam.pos, p_0.plus(j_step.prod((double)j*sample_lev+sj+0.1+0.8*rand.nextDouble()).plus(i_step.prod((double)i*sample_lev+si+0.1+0.8*rand.nextDouble()))));
-                        rgb = trace(camray, this.max_recurs,-1);
+                        rgb = trace(camray, this.max_recurs,-1); //main logic method
                         lightInt[ind] += rgb[0];
                         lightInt[ind+1] += rgb[1];
                         lightInt[ind+2] += rgb[2];
@@ -230,6 +237,8 @@ class Scene{
                         
                     }
                 }
+                
+                //print '.' for each %1 of pixels calculated
                 pixs++;
                 if(pixs% perc_pixs == 0)
                     System.out.print('.');

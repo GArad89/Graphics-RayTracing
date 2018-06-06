@@ -57,7 +57,9 @@ class Vector{
                       this.z - other.z);
     }
     
-    public Vector getPerp(){
+    
+    //get a vector perpendicular to the current vector
+    public Vector getPerp(){ 
     	if(this.x == 0) {
     		return new Vector (1,0,0);
     	}
@@ -72,6 +74,7 @@ class Vector{
     	return new Vector(x2,y2,z2);
     }
     
+    //returns the size of the vector
     public double size() {
     	return (double)Math.sqrt(this.dot(this));
     }

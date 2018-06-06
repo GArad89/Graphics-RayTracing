@@ -274,15 +274,7 @@ public class RayTracer {
         byte[] rgbData = new byte[this.imageWidth * this.imageHeight * 3];
         scene.Render(rgbData, this.imageWidth, this.imageHeight);
  
-                // Put your ray tracing code here!
-                //
-                // Write pixel color values in RGB format to rgbData:
-                // Pixel [x, y] red component is in rgbData[(y * this.imageWidth + x) * 3]
-                //            green component is in rgbData[(y * this.imageWidth + x) * 3 + 1]
-                //             blue component is in rgbData[(y * this.imageWidth + x) * 3 + 2]
-                //
-                // Each of the red, green and blue components should be a byte, i.e. 0-255
- 
+
  
         long endTime = System.currentTimeMillis();
         Long renderTime = endTime - startTime;
