@@ -4,6 +4,7 @@ class Material{
      double diff_r, diff_g, diff_b;
      double spec_r, spec_g, spec_b;
      double reflect_r, reflect_g, reflect_b;
+	 boolean reflect;
      double phong;
      double trans;
     
@@ -20,6 +21,7 @@ class Material{
         this.reflect_r = reflect_r;
         this.reflect_g = reflect_g;
         this.reflect_b = reflect_b;
+		this.reflect = (reflect_r > 0) || (reflect_g > 0) || (reflect_b > 0);
         this.phong = phong;
         this.trans = trans;        
     }

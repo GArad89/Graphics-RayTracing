@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+
  
 import javax.imageio.ImageIO;
  
@@ -104,7 +104,7 @@ public class RayTracer {
                 String code = line.substring(0, 3).toLowerCase();
                 // Split according to white space characters:
                 String[] params = line.substring(3).trim().toLowerCase().split("\\s+");
- 
+                
                 if (code.equals("cam"))
                 {
                 	if(params.length >= 11) {
@@ -206,7 +206,7 @@ public class RayTracer {
                 else if (code.equals("trg"))
                 {
                 	if(params.length >= 10) {
-                		mat_index=Integer.parseInt(params[4])-1;
+                		mat_index=Integer.parseInt(params[9])-1;
                 		if(mats.size() > mat_index) {
 		                	 mat = mats.get(Integer.parseInt(params[9])-1);
 		                     surf = new Triangle(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
@@ -274,15 +274,7 @@ public class RayTracer {
         byte[] rgbData = new byte[this.imageWidth * this.imageHeight * 3];
         scene.Render(rgbData, this.imageWidth, this.imageHeight);
  
-                // Put your ray tracing code here!
-                //
-                // Write pixel color values in RGB format to rgbData:
-                // Pixel [x, y] red component is in rgbData[(y * this.imageWidth + x) * 3]
-                //            green component is in rgbData[(y * this.imageWidth + x) * 3 + 1]
-                //             blue component is in rgbData[(y * this.imageWidth + x) * 3 + 2]
-                //
-                // Each of the red, green and blue components should be a byte, i.e. 0-255
- 
+
  
         long endTime = System.currentTimeMillis();
         Long renderTime = endTime - startTime;
@@ -335,7 +327,8 @@ public class RayTracer {
         return result;
     }
  
-    public static class RayTracerException extends Exception {
+    @SuppressWarnings("serial")
+	public static class RayTracerException extends Exception {
         public RayTracerException(String msg) {  super(msg); }
     }
     
