@@ -38,11 +38,12 @@ class Scene{
         this.lights.add(light);
     }
     
-    public double[] trace(Ray camray, int rec){
+    public double[] trace(Ray camray, int rec,int ignore){
         if(rec == -1){
             double rgb[] = {this.bg_r, this.bg_g, this.bg_b};
             return rgb;
         }
+  
         Vector dir1, dir2;
         int min_ind=-1;
         double cnt=0;
@@ -55,11 +56,13 @@ class Scene{
         Vector normal, returning_ray, pos=null;
         Rect rect;
         for(int k=0;k< this.surfs.size();k++) {
-            temp = this.surfs.get(k).intersect(camray);
-            if(temp >= 0 && temp < min_val) {
-                min_ind = k;
-                min_val = temp;
-            }
+        	if( k != ignore) {
+	            temp = this.surfs.get(k).intersect(camray);
+	            if(temp >= 0 && temp < min_val) {
+	                min_ind = k;
+	                min_val = temp;
+	            }
+	        }
         }
 
     //        		pixelCord = camleft.prod(((double)j)/((double)imageWidth));
@@ -70,12 +73,14 @@ class Scene{
             pos = camray.getPos(min_val);
             normal = this.surfs.get(min_ind).normal(pos);
             normal = normal.prod(1/normal.size()); //make sure it is normalized
+//            if(min_ind == 1 && normal.y >= 0)
+//            	System.out.println(normal);
             mat = this.surfs.get(min_ind).mat;
             trans = mat.trans;
             double light_val,light_total=1,temp2;
             double bg_rgb[], reflect_rgb[];
             if(trans < 1){
-                bg_rgb = trace(new Ray(pos, camray.direct), rec-1);
+                bg_rgb = trace(new Ray(pos, camray.direct), rec-1,min_ind);
                 bg_r = bg_rgb[0];
                 bg_g = bg_rgb[1];
                 bg_b = bg_rgb[2];            
@@ -84,7 +89,7 @@ class Scene{
             returning_ray = normal.prod(-normal.dot(camray.direct)).plus(returning_ray);
             returning_ray = returning_ray.prod(1/returning_ray.size());
             if(mat.reflect){
-                reflect_rgb = trace(new Ray(pos, returning_ray), rec-1);
+                reflect_rgb = trace(new Ray(pos, returning_ray), rec-1,min_ind);
                 reflect_r = reflect_rgb[0]*mat.reflect_r;
                 reflect_g = reflect_rgb[1]*mat.reflect_g;
                 reflect_b = reflect_rgb[2]*mat.reflect_b;  
@@ -138,14 +143,15 @@ class Scene{
                 }
                 
                 //i'm not sure why it is happening but we get better results for a sphere without the shadow_intes part and better results for planes with that part.
-                int mod;
-                if(this.surfs.get(min_ind) instanceof Sphere) {
-                	mod =0 ;
-                }
-                else {
-                	mod = 1;
-                }
-                
+                int mod =1; //since it is required to add shadow_intesity we keep it "on" but we get closer results (to the examples) for the spheres without it for some reason...
+
+           //the code for removing shadow_intesity from the spheres if someone wants to check it     
+//                if(this.surfs.get(min_ind) instanceof Sphere) {
+//                	mod =0 ;
+//                }
+//                else {
+//                	mod = 1;
+//                }
                 temp = (((double)(cnt)+mod*(rays_num2-(double)(cnt))*((double)1.0-lightray.light.shadow_intens))/rays_num2);
      
                 temp = Math.abs(temp*normal.dot(lightray.direct));
@@ -216,7 +222,7 @@ class Scene{
                 for(si=0;si<sample_lev;si++){
                     for(sj=0;sj<sample_lev;sj++){
                         camray = new Ray(this.cam.pos, p_0.plus(j_step.prod((double)j*sample_lev+sj+0.1+0.8*rand.nextDouble()).plus(i_step.prod((double)i*sample_lev+si+0.1+0.8*rand.nextDouble()))));
-                        rgb = trace(camray, this.max_recurs);
+                        rgb = trace(camray, this.max_recurs,-1);
                         lightInt[ind] += rgb[0];
                         lightInt[ind+1] += rgb[1];
                         lightInt[ind+2] += rgb[2];
