@@ -226,6 +226,145 @@ public class RayTracer {
                 		System.out.println(String.format("ERROR: Parsed triangle is missing parameters (line %d)", lineNum));
                 	}
                 }
+                else if (code.equals("hrt"))
+                {
+                	if(params.length >= 5) {
+	                	mat_index=Integer.parseInt(params[4])-1;
+	                	if(mats.size() > mat_index) {
+		                	mat = mats.get(mat_index);
+		                    surf = new Heart(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
+		                                     Double.parseDouble(params[3]), mat);
+		                    scene.addSurface(surf);
+		 
+		                                        // Example (you can implement this in many different ways!):
+		                    // Sphere sphere = new Sphere();
+		                                        // sphere.setCenter(params[0], params[1], params[2]);
+		                                        // sphere.setRadius(params[3]);
+		                                        // sphere.setMaterial(params[4]);
+		 
+		                    System.out.println(String.format("Parsed Heart (line %d)", lineNum));
+	                	}
+	                	else {
+	                		missing_mat = true;
+	                		System.out.println(String.format("ERROR: material index for heart doesn't exist (line %d)", lineNum));
+	                	}
+                	}
+                  	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed heart is missing parameters (line %d)", lineNum));
+                	}
+                }
+				else if (code.equals("cyl"))
+                {
+                	if(params.length >= 4) {
+	                	mat_index=Integer.parseInt(params[3])-1;
+	                	if(mats.size() > mat_index) {
+		                	mat = mats.get(mat_index);
+		                    surf = new Cylinder(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]), mat);
+		                    scene.addSurface(surf);
+		 
+		                                        // Example (you can implement this in many different ways!):
+		                    // Sphere sphere = new Sphere();
+		                                        // sphere.setCenter(params[0], params[1], params[2]);
+		                                        // sphere.setRadius(params[3]);
+		                                        // sphere.setMaterial(params[4]);
+		 
+		                    System.out.println(String.format("Parsed cylinder (line %d)", lineNum));
+	                	}
+	                	else {
+	                		missing_mat = true;
+	                		System.out.println(String.format("ERROR: material index for cylinder doesn't exist (line %d)", lineNum));
+	                	}
+                	}
+                  	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed cylinder is missing parameters (line %d)", lineNum));
+                	}
+                }
+				else if (code.equals("con"))
+                {
+                	if(params.length >= 5) {
+	                	mat_index=Integer.parseInt(params[4])-1;
+	                	if(mats.size() > mat_index) {
+		                	mat = mats.get(mat_index);
+		                    surf = new Cone(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
+		                                    Double.parseDouble(params[3]), mat);
+		                    scene.addSurface(surf);
+		 
+		                                        // Example (you can implement this in many different ways!):
+		                    // Sphere sphere = new Sphere();
+		                                        // sphere.setCenter(params[0], params[1], params[2]);
+		                                        // sphere.setRadius(params[3]);
+		                                        // sphere.setMaterial(params[4]);
+		 
+		                    System.out.println(String.format("Parsed cone (line %d)", lineNum));
+	                	}
+	                	else {
+	                		missing_mat = true;
+	                		System.out.println(String.format("ERROR: material index for cone doesn't exist (line %d)", lineNum));
+	                	}
+                	}
+                  	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed Cone is missing parameters (line %d)", lineNum));
+                	}
+                }
+				else if (code.equals("elp"))
+                {
+                	if(params.length >= 7) {
+	                	mat_index=Integer.parseInt(params[6])-1;
+	                	if(mats.size() > mat_index) {
+		                	mat = mats.get(mat_index);
+		                    surf = new Ellipse(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
+		                                       Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5]), mat);
+							scene.addSurface(surf);
+		 
+		                                        // Example (you can implement this in many different ways!):
+		                    // Sphere sphere = new Sphere();
+		                                        // sphere.setCenter(params[0], params[1], params[2]);
+		                                        // sphere.setRadius(params[3]);
+		                                        // sphere.setMaterial(params[4]);
+		 
+		                    System.out.println(String.format("Parsed ellipse (line %d)", lineNum));
+	                	}
+	                	else {
+	                		missing_mat = true;
+	                		System.out.println(String.format("ERROR: material index for ellipse doesn't exist (line %d)", lineNum));
+	                	}
+                	}
+                  	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed ellipse is missing parameters (line %d)", lineNum));
+                	}
+                }
+				else if (code.equals("wav"))
+                {
+                	if(params.length >= 7) {
+	                	mat_index=Integer.parseInt(params[6])-1;
+	                	if(mats.size() > mat_index) {
+		                	mat = mats.get(mat_index);
+		                    surf = new Wave(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]),
+		                                    Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5]), mat);
+		                    scene.addSurface(surf);
+		 
+		                                        // Example (you can implement this in many different ways!):
+		                    // Sphere sphere = new Sphere();
+		                                        // sphere.setCenter(params[0], params[1], params[2]);
+		                                        // sphere.setRadius(params[3]);
+		                                        // sphere.setMaterial(params[4]);
+		 
+		                    System.out.println(String.format("Parsed wave (line %d)", lineNum));
+	                	}
+	                	else {
+	                		missing_mat = true;
+	                		System.out.println(String.format("ERROR: material index for wave doesn't exist (line %d)", lineNum));
+	                	}
+                	}
+                  	else {
+                		missing_paramter = true;
+                		System.out.println(String.format("ERROR: Parsed wave is missing parameters (line %d)", lineNum));
+                	}
+                }				
                 else if (code.equals("lgt"))
                 {
                 	if(params.length >= 9) {

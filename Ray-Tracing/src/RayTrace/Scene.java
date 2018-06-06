@@ -204,7 +204,7 @@ class Scene{
                 lightInt[ind+2] /=  sample_lev2;
             }
         }
-        System.out.println('.');
+       System.out.println('.');
        for(int k=0; k< rgbData.length;k++){
            rgbData[k] =(byte) (255*(Math.min(1, lightInt[k])));
        }
