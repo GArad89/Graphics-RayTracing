@@ -1,5 +1,7 @@
 package RayTrace;
  
+//example for running jar file from Linux terminal : java -jar Ray-Tracing.jar Triangle2.txt Triangle2.png 
+
 import java.awt.Transparency;
 import java.awt.color.*;
 import java.awt.image.*;
